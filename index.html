@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Puzzle Bobble</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -12,11 +12,13 @@
       <span>SCORE: <strong id="score-display">0</strong></span>
       <span>NEXT: <canvas id="next-canvas" width="44" height="44"></canvas></span>
     </div>
-    <canvas id="game-canvas" width="480" height="600"></canvas>
+    <div id="canvas-wrap">
+    <canvas id="game-canvas" width="396" height="600"></canvas>
     <div id="overlay" class="hidden">
       <h1 id="overlay-title">GAME OVER</h1>
       <p id="overlay-score"></p>
       <button id="restart-btn">Play Again</button>
+    </div>
     </div>
   </div>
   <script src="game.js"></script>
