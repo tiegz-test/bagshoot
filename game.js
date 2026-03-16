@@ -48,8 +48,11 @@ document.getElementById('restart-btn').addEventListener('click', init);
 // We scale the CSS display size to fit the viewport, and compensate in event coords.
 function resize() {
   const gap = 8;
+  const bodyStyle = getComputedStyle(document.body);
+  const safeTop    = parseFloat(bodyStyle.paddingTop)    || 0;
+  const safeBottom = parseFloat(bodyStyle.paddingBottom) || 0;
   const maxW = window.innerWidth;
-  const maxH = window.innerHeight - hudEl.offsetHeight - gap * 2;
+  const maxH = window.innerHeight - safeTop - safeBottom - hudEl.offsetHeight - gap * 2;
   const scale = Math.min(1, maxW / CANVAS_W, maxH / CANVAS_H);
   const w = Math.floor(CANVAS_W * scale);
   const h = Math.floor(CANVAS_H * scale);
