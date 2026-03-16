@@ -34,8 +34,6 @@ let pops;          // [{x,y,r,alpha}] pop animations
 // ─── Canvas / DOM ─────────────────────────────────────────────────────────────
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
-const nextCanvas = document.getElementById('next-canvas');
-const nextCtx = nextCanvas.getContext('2d');
 const scoreEl = document.getElementById('score-display');
 const overlay = document.getElementById('overlay');
 const overlayScore = document.getElementById('overlay-score');
@@ -116,7 +114,6 @@ function init() {
   nextColor = rand(COLORS);
   overlay.classList.add('hidden');
   scoreEl.textContent = '0';
-  drawNextBubble();
 
   if (!window._loopStarted) {
     window._loopStarted = true;
@@ -240,7 +237,6 @@ function snapAndPlace() {
   }
 
   nextColor = rand(COLORS);
-  drawNextBubble();
 }
 
 function hasFilledNeighbor(row, col) {
@@ -313,7 +309,6 @@ function shoot() {
   const vy = -Math.cos(cannonAngle) * BUBBLE_SPEED;
   flying = { x: CANNON_X, y: CANNON_Y, vx, vy, color: nextColor };
   nextColor = rand(COLORS);
-  drawNextBubble();
 }
 
 // ─── Draw ─────────────────────────────────────────────────────────────────────
@@ -420,14 +415,8 @@ function drawCannon() {
   ctx.lineTo(tipX, tipY);
   ctx.stroke();
 
-  // Base circle
-  ctx.beginPath();
-  ctx.arc(CANNON_X, CANNON_Y, 18, 0, Math.PI * 2);
-  ctx.fillStyle = '#7f8c8d';
-  ctx.fill();
-  ctx.strokeStyle = '#95a5a6';
-  ctx.lineWidth = 3;
-  ctx.stroke();
+  // Next bubble sitting in the cannon base
+  drawBubble(ctx, CANNON_X, CANNON_Y, R, nextColor);
   ctx.restore();
 }
 
@@ -459,10 +448,6 @@ function drawAimGuide() {
   ctx.restore();
 }
 
-function drawNextBubble() {
-  nextCtx.clearRect(0, 0, 44, 44);
-  drawBubble(nextCtx, 22, 22, R, nextColor);
-}
 
 // ─── Events ───────────────────────────────────────────────────────────────────
 function updateAngle(clientX, clientY) {
