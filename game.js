@@ -40,7 +40,33 @@ const scoreEl = document.getElementById('score-display');
 const overlay = document.getElementById('overlay');
 const overlayScore = document.getElementById('overlay-score');
 const overlayTitle = document.getElementById('overlay-title');
+const hudEl = document.getElementById('hud');
 document.getElementById('restart-btn').addEventListener('click', init);
+
+// ─── Responsive scaling ───────────────────────────────────────────────────────
+// The canvas internal resolution stays at CANVAS_W×CANVAS_H.
+// We scale the CSS display size to fit the viewport, and compensate in event coords.
+function resize() {
+  const gap = 8;
+  const maxW = window.innerWidth;
+  const maxH = window.innerHeight - hudEl.offsetHeight - gap * 2;
+  const scale = Math.min(1, maxW / CANVAS_W, maxH / CANVAS_H);
+  const w = Math.floor(CANVAS_W * scale);
+  const h = Math.floor(CANVAS_H * scale);
+  canvas.style.width  = w + 'px';
+  canvas.style.height = h + 'px';
+  hudEl.style.width   = w + 'px';
+}
+window.addEventListener('resize', resize);
+
+// Convert a CSS-space point on the canvas to logical game coordinates
+function toLogical(clientX, clientY) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (clientX - rect.left) * (CANVAS_W / rect.width),
+    y: (clientY - rect.top)  * (CANVAS_H / rect.height),
+  };
+}
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
@@ -436,34 +462,31 @@ function drawNextBubble() {
 }
 
 // ─── Events ───────────────────────────────────────────────────────────────────
-canvas.addEventListener('mousemove', e => {
-  const rect = canvas.getBoundingClientRect();
-  const mx = e.clientX - rect.left;
-  const my = e.clientY - rect.top;
-  const dx = mx - CANNON_X;
-  const dy = my - CANNON_Y;
-  let angle = Math.atan2(dx, -dy);
-  // Restrict to upward range (prevent shooting downward)
-  angle = clamp(angle, -Math.PI * 0.85, Math.PI * 0.85);
-  cannonAngle = angle;
-});
+function updateAngle(clientX, clientY) {
+  const { x, y } = toLogical(clientX, clientY);
+  let angle = Math.atan2(x - CANNON_X, -(y - CANNON_Y));
+  cannonAngle = clamp(angle, -Math.PI * 0.85, Math.PI * 0.85);
+}
 
+canvas.addEventListener('mousemove', e => updateAngle(e.clientX, e.clientY));
 canvas.addEventListener('click', shoot);
 
-// Touch support
+// Touch: drag to aim, release to shoot
 canvas.addEventListener('touchstart', e => {
   e.preventDefault();
-  const touch = e.touches[0];
-  const rect = canvas.getBoundingClientRect();
-  const mx = touch.clientX - rect.left;
-  const my = touch.clientY - rect.top;
-  const dx = mx - CANNON_X;
-  const dy = my - CANNON_Y;
-  let angle = Math.atan2(dx, -dy);
-  angle = clamp(angle, -Math.PI * 0.85, Math.PI * 0.85);
-  cannonAngle = angle;
+  updateAngle(e.touches[0].clientX, e.touches[0].clientY);
+}, { passive: false });
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  updateAngle(e.touches[0].clientX, e.touches[0].clientY);
+}, { passive: false });
+
+canvas.addEventListener('touchend', e => {
+  e.preventDefault();
   shoot();
 }, { passive: false });
 
 // ─── Start ────────────────────────────────────────────────────────────────────
 init();
+resize();
