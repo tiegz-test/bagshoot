@@ -1,10 +1,10 @@
 // ─── Constants ───────────────────────────────────────────────────────────────
-const CANVAS_W = 480;
+const CANVAS_W = 396;
 const CANVAS_H = 600;
 const R = 22;                         // bubble radius
 const DIAM = R * 2;
 const ROW_H = R * Math.sqrt(3);       // vertical distance between row centers
-const COLS = 10;
+const COLS = 8;
 const ROWS = 12;                      // total logical rows (top 8 populated at start)
 const INIT_ROWS = 8;
 const MARGIN = R;                     // left margin so col0 center sits at R+offset
